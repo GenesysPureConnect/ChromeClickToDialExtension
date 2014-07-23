@@ -1,0 +1,33 @@
+task :default do
+    if !Dir.exists?( "bin")
+        Dir.mkdir "bin"
+    end
+
+    if File.exists?( "temp.pem")
+        FileUtils.rm "temp.pem"
+    end
+
+    pemFile = ''
+    if File.exists?('pem/chrome.pem')
+      pemFile = '--pack-extension-key=pem/chrome.pem'
+    end
+
+    if File.exists?( "bin/chrome_inin_clicktocall.crx")
+        FileUtils.rm "bin/chrome_inin_clicktocall.crx"
+    end
+
+    Dir.chdir('plugin') do
+      sh 'zip -r ../bin/chrome_inin_clicktocall.zip *'
+    end
+
+    sh '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --pack-extension=plugin ' + pemFile
+    FileUtils.mv "plugin.crx", "bin/chrome_inin_clicktocall.crx"
+
+    if !Dir.exists?( "pem")
+      Dir.mkdir "pem"
+    end
+
+    if File.exists?("plugin.pem")
+      FileUtils.mv "plugin.pem", "pem/chrome.pem"
+    end
+end
