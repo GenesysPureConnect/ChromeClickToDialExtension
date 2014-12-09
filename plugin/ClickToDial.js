@@ -7,6 +7,8 @@ ININ.ClickToDial.DataKeys.DATA_KEY_NUMBER_TO_DIAL = 'inin_numbertodial';
 ININ.ClickToDial.Core = function () {
 
     var __phoneNumberRegex = /(^|\D)((?:(?:\+?1[\s\.-]?)?\(?[2-9]\d\d\)?[\s\.-]?)?[2-9]\d{2}[\s\.-]?\d{4})($|\D)/g;
+    var __commentRegex = /\/\*[\W\w]*\*\//;
+    var __cssRegex = /[#.][\w -]*\{[\W\w]*\}/;
 
     var dataKeys = ININ.ClickToDial.DataKeys;
     var isWebClientRunning = false;
@@ -16,7 +18,7 @@ ININ.ClickToDial.Core = function () {
         var number = elem.data(dataKeys.DATA_KEY_NUMBER_TO_DIAL);
         if (number) {
 
-        //    window.location = 'callto:' + number;
+        //    window.location = 'tel:' + number;
             try
             {
 
@@ -58,13 +60,26 @@ ININ.ClickToDial.Core = function () {
                     return;
                 }
 
-                var numberMatches = nodeText.match(__phoneNumberRegex);
+                if(nodeText.match(__commentRegex) != null){
+                    //this number is in a comment, return
+                    return;
+                }
 
+                if(nodeText.match(__cssRegex) != null){
+                    //this number is in a css style, return
+                    return;
+                }
+
+                var numberMatches = nodeText.match(__phoneNumberRegex);
                 if(numberMatches == null){
                     return;
                 }
 
                 var number = numberMatches[0].replace(/\W+/g,"");
+
+                console.log("found phone number: " + number)
+                console.log(nodeText)
+                console.log(ININ.$(this))
 
                 var id = ININ.Utils.generateRandomId();
                 var newNode = document.createElement('a');
@@ -75,11 +90,8 @@ ININ.ClickToDial.Core = function () {
                 newNode.setAttribute("data-" + dataKeys.DATA_KEY_NUMBER_TO_DIAL, number);
                 newNode.setAttribute("id",id);
 
-                //newNode.addEventListener("click", clickHandlerMethod, false);
-
 
                 ININ.$(this).wrap(newNode);
-
                 ININ.$('#' + id).bind('click', clickHandlerMethod);
                 ININ.$('#' + id).data(dataKeys.DATA_KEY_NUMBER_TO_DIAL, number);
 

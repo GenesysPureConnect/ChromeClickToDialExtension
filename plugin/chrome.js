@@ -9,7 +9,7 @@ document.addEventListener("ClickToCall", function(data) {
 
     chrome.runtime.sendMessage(JSON.stringify(callData), function(response){
         if(response.number) {
-            window.location = 'callto:' + response.number;
+            window.location = 'tel:' + response.number;
         }
     });
 });
